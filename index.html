@@ -5,17 +5,33 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
-<body style="margin: 0; overflow: hidden;">
+<body style="margin: 0; overflow: hidden; font-family: Arial, sans-serif;">
+
+    <div style="position: fixed; bottom: 30px; width: 100%; text-align: center; z-index: 10; display: flex; justify-content: center; gap: 10px;">
+        <button onclick="scan('AC_01')" style="padding: 12px 20px; background: #ff4d4d; color: white; border: none; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">Scan AC</button>
+        <button onclick="scan('FRIDGE_01')" style="padding: 12px 20px; background: #ffa500; color: white; border: none; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">Scan Fridge</button>
+        <button onclick="scan('LED_01')" style="padding: 12px 20px; background: #2ecc71; color: white; border: none; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">Scan LED</button>
+    </div>
+
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-marker preset="hiro">
-            <a-sphere id="cloud" position="0 0.5 0" radius="0.5" material="color: grey; opacity: 0.8"></a-sphere>
-            <a-entity id="infoText" position="0 1.2 0" text="value: Scanning...; color: black; align: center; width: 4;"></a-entity>
+            <a-sphere id="cloud" position="0 0.5 0" radius="0.5" material="color: grey; opacity: 0.9; transparent: true"></a-sphere>
+            
+            <a-plane position="0 1.5 0" width="3" height="1.2" material="color: black; opacity: 0.8">
+                <a-text id="infoText" value="Tap a button below\nto begin scan" align="center" color="white" width="6" position="0 0 0.1"></a-text>
+            </a-plane>
         </a-marker>
+        
         <a-entity camera></a-entity>
     </a-scene>
+
     <script>
         const BACKEND_URL = window.location.origin + "/calculate";
+
         async function scan(id) {
+            // Give feedback that scanning is happening
+            document.querySelector('#infoText').setAttribute('text', 'value', 'Fetching Data...');
+            
             try {
                 const res = await fetch(BACKEND_URL, {
                     method: 'POST',
@@ -23,11 +39,19 @@
                     body: JSON.stringify({ id: id })
                 });
                 const data = await res.json();
+                
+                // Update 3D Color Nudge
                 document.querySelector('#cloud').setAttribute('material', 'color', data.color);
-                document.querySelector('#infoText').setAttribute('text', 'value', `${data.name}\n${data.watts}W\n${data.nudge}`);
-            } catch (e) { console.error(e); }
+                
+                // Update Stats Display
+                const stats = `${data.name}\n${data.watts} Watts\n${data.nudge}`;
+                document.querySelector('#infoText').setAttribute('text', 'value', stats);
+                
+            } catch (e) { 
+                console.error("Connection Error:", e);
+                document.querySelector('#infoText').setAttribute('text', 'value', 'Error: Backend Offline');
+            }
         }
-        document.querySelector('a-marker').addEventListener('markerFound', () => { scan("AC_01"); });
     </script>
 </body>
 </html>

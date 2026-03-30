@@ -29,18 +29,29 @@ def home():
 @app.route('/calculate', methods=['POST'])
 def calculate():
     data = request.json
-    appliance_id = data.get('id', 'AC_01')
+    appliance_id = data.get('id')
     
     appliance = collection.find_one({"id": appliance_id})
     
     if appliance:
         watts = appliance['watts']
-        is_high = watts > 2000
+        
+        # --- DYNAMIC NUDGE LOGIC ---
+        if watts > 2000: # Old Window AC (2800W)
+            color = "red"
+            nudge = "⚠️ CRITICAL: High DEWA Slab 3"
+        elif watts > 100: # Fridge (450W)
+            color = "yellow"
+            nudge = "⚡ MODERATE: Essential Load"
+        else: # LED Bulb (12W)
+            color = "green"
+            nudge = "✅ EFFICIENT: Low Impact"
+
         return jsonify({
             "name": appliance['name'],
             "watts": watts,
-            "color": "red" if is_high else "green",
-            "nudge": "⚠️ HIGH USAGE (Slab 3)" if is_high else "✅ EFFICIENT"
+            "color": color,
+            "nudge": nudge
         })
     return jsonify({"error": "Appliance not found"}), 404
 
