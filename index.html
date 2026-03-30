@@ -17,9 +17,17 @@
         <a-marker preset="hiro">
             <a-sphere id="cloud" position="0 0.5 0" radius="0.5" material="color: grey; opacity: 0.9; transparent: true"></a-sphere>
             
-            <a-plane position="0 1.5 0" width="3" height="1.2" material="color: black; opacity: 0.8">
-                <a-text id="infoText" value="Tap a button below\nto begin scan" align="center" color="white" width="6" position="0 0 0.1"></a-text>
-            </a-plane>
+            <a-entity position="0 1.6 0">
+                <a-plane width="3.2" height="1.4" material="color: black; opacity: 0.8"></a-plane>
+                
+                <a-text id="infoText" 
+                        value="Select an item\nto view stats" 
+                        align="center" 
+                        color="white" 
+                        width="5.5" 
+                        position="0 0 0.1">
+                </a-text>
+            </a-entity>
         </a-marker>
         
         <a-entity camera></a-entity>
@@ -29,8 +37,8 @@
         const BACKEND_URL = window.location.origin + "/calculate";
 
         async function scan(id) {
-            // Give feedback that scanning is happening
-            document.querySelector('#infoText').setAttribute('text', 'value', 'Fetching Data...');
+            const infoText = document.querySelector('#infoText');
+            infoText.setAttribute('value', 'Loading Data...');
             
             try {
                 const res = await fetch(BACKEND_URL, {
@@ -40,16 +48,17 @@
                 });
                 const data = await res.json();
                 
-                // Update 3D Color Nudge
+                // 1. Update the 3D Sphere Color
                 document.querySelector('#cloud').setAttribute('material', 'color', data.color);
                 
-                // Update Stats Display
-                const stats = `${data.name}\n${data.watts} Watts\n${data.nudge}`;
-                document.querySelector('#infoText').setAttribute('text', 'value', stats);
+                // 2. Update the Text Details
+                // We use \n for line breaks to make it look like a list
+                const statsStr = `${data.name}\n${data.watts} Watts\n${data.nudge}`;
+                infoText.setAttribute('value', statsStr);
                 
             } catch (e) { 
                 console.error("Connection Error:", e);
-                document.querySelector('#infoText').setAttribute('text', 'value', 'Error: Backend Offline');
+                infoText.setAttribute('value', 'Error: Link Broken');
             }
         }
     </script>
