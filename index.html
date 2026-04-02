@@ -5,50 +5,47 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        body { font-family: 'Arial', sans-serif; }
-        .btn { padding: 12px; color: white; border: none; border-radius: 25px; font-weight: bold; flex: 1; font-size: 11px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        .ui-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 100; }
+        .btn { padding: 15px 20px; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
-        /* Instructions Panel */
         #instructions {
-            position: fixed; top: 10px; width: 90%; left: 5%; background: rgba(0,0,0,0.9);
-            color: white; padding: 15px; border-radius: 12px; z-index: 30; text-align: left; border: 2px solid #2ecc71;
+            position: fixed; top: 10px; width: 80%; left: 10%; background: rgba(0,0,0,0.85);
+            color: white; padding: 15px; border-radius: 12px; z-index: 110; text-align: center; border: 2px solid #2ecc71;
         }
 
-        /* Separate Recommendation Pop-up */
+        #tipButton {
+            display: none; position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+            background: #2ecc71; color: white; padding: 12px 25px; border-radius: 30px;
+            font-weight: bold; z-index: 100; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
         #recBox {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; background: white; color: black; padding: 25px; border-radius: 15px;
-            z-index: 50; box-shadow: 0 0 30px rgba(0,0,0,0.7); text-align: center;
-        }
-
-        /* New button that only appears after a scan */
-        #tipButton {
-            display: none; position: fixed; top: 180px; left: 50%; transform: translateX(-50%);
-            background: #2ecc71; color: white; padding: 10px 20px; border-radius: 20px;
-            font-weight: bold; z-index: 20; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 80%; background: white; color: black; padding: 25px; border-radius: 20px;
+            z-index: 120; box-shadow: 0 0 30px rgba(0,0,0,0.8); text-align: center;
         }
     </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
+<body>
 
     <div id="instructions">
-        <h4 style="margin: 0 0 10px 0; color: #2ecc71;">Getting Started:</h4>
-        1. Increase Laptop Brightness to 100% 💡<br>
-        2. Allow Camera Access 📸<br>
-        3. Point phone camera at the <strong>Hiro Marker</strong> 🎯<br>
-        4. Select an appliance button below to see data.<br>
-        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; background:#2ecc71; border:none; color:white; padding:8px; border-radius:5px; font-weight:bold;">I'm Ready</button>
+        <strong>How to scan:</strong><br>
+        1. Set Laptop Brightness to 100% 💡<br>
+        2. Point camera at the Hiro Marker 🎯<br>
+        3. Tap an appliance button below.
+        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; background:#2ecc71; color:white; border:none; padding:8px; border-radius:5px;">Got it!</button>
     </div>
 
     <button id="tipButton" onclick="showTip()">💡 View Sustainability Method</button>
 
     <div id="recBox">
         <h3 style="color:#2ecc71; margin-top:0;">Sustainability Method</h3>
-        <p id="recText" style="font-size: 16px;"></p>
+        <p id="recText"></p>
         <button onclick="document.getElementById('recBox').style.display='none'" style="background:#333; color:white; border:none; padding:10px 20px; border-radius:8px;">Close</button>
     </div>
 
-    <div style="position: fixed; bottom: 30px; width: 96%; left: 2%; display: flex; gap: 8px; z-index: 10;">
+    <div class="ui-container">
         <button onclick="scan('AC_01')" class="btn" style="background: #ff4d4d;">Scan AC</button>
         <button onclick="scan('FRIDGE_01')" class="btn" style="background: #ffa500;">Scan Fridge</button>
         <button onclick="scan('LED_01')" class="btn" style="background: #2ecc71;">Scan LED</button>
@@ -56,23 +53,29 @@
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <a-marker preset="hiro">
-            <a-sphere id="cloud" position="0 0.5 0" radius="0.5" material="color: grey; opacity: 0.9"></a-sphere>
+            <a-sphere id="cloud" position="0 0.5 0" radius="0.4" material="color: grey; opacity: 0.9"></a-sphere>
             
-            <a-entity position="0 1.6 0">
-                <a-plane width="3.2" height="1.4" material="color: black; opacity: 0.85"></a-plane>
-                <a-text id="infoText" value="Scan Marker & \nSelect Appliance" align="center" color="white" width="5.5" position="0 0 0.1"></a-text>
+            <a-entity position="0 1.2 0" scale="1.5 1.5 1.5">
+                <a-plane width="2.2" height="1" material="color: black; opacity: 0.8"></a-plane>
+                <a-text id="infoText" 
+                        value="Select Appliance\nTo Load Data" 
+                        align="center" 
+                        color="white" 
+                        width="4" 
+                        position="0 0 0.1">
+                </a-text>
             </a-entity>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        let savedTip = "";
+        let currentTip = "";
 
         async function scan(id) {
             const infoText = document.querySelector('#infoText');
             const sphere = document.querySelector('#cloud');
-            infoText.setAttribute('value', 'Connecting to Database...');
+            infoText.setAttribute('value', 'Fetching...');
             
             try {
                 const res = await fetch(window.location.origin + "/calculate", {
@@ -82,21 +85,24 @@
                 });
                 const data = await res.json();
                 
-                // Update Sphere Color and Text Details
+                // 1. Update Color
                 sphere.setAttribute('material', 'color', data.color);
-                infoText.setAttribute('value', `${data.name}\n${data.watts}W | AED ${data.cost}/hr\n${data.nudge}`);
                 
-                // Store recommendation and show the "View Tip" button
-                savedTip = data.tip;
+                // 2. Update Details (Name, Watts, Price)
+                const details = `${data.name}\n${data.watts}W | AED ${data.cost}/hr\n${data.nudge}`;
+                infoText.setAttribute('value', details);
+                
+                // 3. Save Tip and show the green button
+                currentTip = data.tip;
                 document.getElementById('tipButton').style.display = 'block';
                 
             } catch (e) { 
-                infoText.setAttribute('value', 'Scan Failed. Check Internet.');
+                infoText.setAttribute('value', 'Error: Link Broken');
             }
         }
 
         function showTip() {
-            document.getElementById('recText').innerText = savedTip;
+            document.getElementById('recText').innerText = currentTip;
             document.getElementById('recBox').style.display = 'block';
         }
     </script>
