@@ -8,16 +8,26 @@ CORS(app)
 
 uri = "mongodb+srv://jujawalid_db_user:Juja2004@ecohomear.dj1aeau.mongodb.net/?retryWrites=true&w=majority"
 
+# --- CONNECT TO DATABASE ---
 try:
-    client = MongoClient(uri, serverSelectionTimeoutMS=10000)
+    client = MongoClient(uri, serverSelectionTimeoutMS=5000)
     db = client.EcohomeAr 
     collection = db.appliances
+    
+    # The 'ping' check
     client.admin.command('ping')
+    print("\n" + "="*30)
+    print("✅ MONGODB CONNECTED SUCCESSFULLY")
+    print(f"📡 Using Collection: {collection.name}")
+    print("="*30 + "\n")
 except Exception as e:
-    print(f"Database Error: {e}")
+    print("\n" + "!"*30)
+    print(f"❌ DATABASE ERROR: {e}")
+    print("!"*30 + "\n")
 
 @app.route('/')
 def home():
+    # This works regardless of which folder you run the command from
     base_dir = os.path.dirname(os.path.abspath(__file__))
     return send_from_directory(base_dir, 'index.html')
 
@@ -29,18 +39,17 @@ def calculate():
     
     if appliance:
         watts = appliance['watts']
-        # DEWA Residential Rates
         rate = 0.38 if watts > 2000 else 0.23
         cost_per_hour = (watts / 1000) * rate
 
         if watts > 2000:
-            color, nudge = "red", "⚠️ HIGH CONSUMPTION"
+            color, nudge = "red", " HIGH CONSUMPTION"
             tip = "Recommendation: Set AC to 24°C to optimize cooling efficiency."
         elif watts > 100:
-            color, nudge = "yellow", "⚡ MODERATE USAGE"
+            color, nudge = "yellow", " MODERATE USAGE"
             tip = "Sustainability: Keep appliances 10cm from walls for better airflow."
         else:
-            color, nudge = "green", "✅ HIGHLY EFFICIENT"
+            color, nudge = "green", "HIGHLY EFFICIENT"
             tip = "Eco-Tip: LED lighting reduces energy waste by 80%."
 
         return jsonify({

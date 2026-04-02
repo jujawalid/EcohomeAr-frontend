@@ -9,6 +9,7 @@
         .ui-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 100; }
         .btn { padding: 15px 20px; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
+        /* Clean Instruction Panel - No Icons */
         #instructions {
             position: fixed; top: 10px; width: 80%; left: 10%; background: rgba(0,0,0,0.85);
             color: white; padding: 15px; border-radius: 12px; z-index: 110; text-align: center; border: 2px solid #2ecc71;
@@ -30,14 +31,14 @@
 <body>
 
     <div id="instructions">
-        <strong>How to scan:</strong><br>
-        1. Set Laptop Brightness to 100% 💡<br>
-        2. Point camera at the Hiro Marker 🎯<br>
+        <strong>Study Instructions:</strong><br>
+        1. Set Laptop Brightness to 100 percent<br>
+        2. Point camera at the Hiro Marker<br>
         3. Tap an appliance button below.
-        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; background:#2ecc71; color:white; border:none; padding:8px; border-radius:5px;">Got it!</button>
+        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; background:#2ecc71; border:none; color:white; padding:8px; border-radius:5px; font-weight:bold;">I'm Ready</button>
     </div>
 
-    <button id="tipButton" onclick="showTip()">💡 View Sustainability Method</button>
+    <button id="tipButton" onclick="showTip()">View Sustainability Method</button>
 
     <div id="recBox">
         <h3 style="color:#2ecc71; margin-top:0;">Sustainability Method</h3>
@@ -51,7 +52,7 @@
         <button onclick="scan('LED_01')" class="btn" style="background: #2ecc71;">Scan LED</button>
     </div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
         <a-marker preset="hiro">
             <a-sphere id="cloud" position="0 0.5 0" radius="0.4" material="color: grey; opacity: 0.9"></a-sphere>
             
@@ -85,14 +86,10 @@
                 });
                 const data = await res.json();
                 
-                // 1. Update Color
                 sphere.setAttribute('material', 'color', data.color);
-                
-                // 2. Update Details (Name, Watts, Price)
                 const details = `${data.name}\n${data.watts}W | AED ${data.cost}/hr\n${data.nudge}`;
                 infoText.setAttribute('value', details);
                 
-                // 3. Save Tip and show the green button
                 currentTip = data.tip;
                 document.getElementById('tipButton').style.display = 'block';
                 
