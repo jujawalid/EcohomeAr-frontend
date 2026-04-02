@@ -52,20 +52,39 @@
         <button onclick="scan('LED_01')" class="btn" style="background: #2ecc71;">Scan LED</button>
     </div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+   <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false;" 
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;">
+        
         <a-marker preset="hiro">
-            <a-sphere id="cloud" position="0 0.5 0" radius="0.4" material="color: grey; opacity: 0.9"></a-sphere>
             
-            <a-entity position="0 1.2 0" scale="1.5 1.5 1.5">
-                <a-plane width="2.2" height="1" material="color: black; opacity: 0.8"></a-plane>
-                <a-text id="infoText" 
-                        value="Select Appliance\nTo Load Data" 
-                        align="center" 
-                        color="white" 
-                        width="4" 
-                        position="0 0 0.1">
+            <a-sphere 
+                id="cloud" 
+                position="0 0.6 0" 
+                radius="0.6" 
+                material="color: grey; opacity: 0.9; shader: flat;">
+            </a-sphere>
+            
+            <a-entity position="0 1.8 0" scale="2 2 2">
+                <a-plane 
+                    width="2.5" 
+                    height="1.2" 
+                    material="color: black; opacity: 0.9">
+                </a-plane>
+                
+                <a-text 
+                    id="infoText" 
+                    value="Select Appliance\nTo Load Data" 
+                    align="center" 
+                    color="white" 
+                    width="4.5" 
+                    position="0 0 0.2"
+                    wrap-count="25">
                 </a-text>
             </a-entity>
+
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
