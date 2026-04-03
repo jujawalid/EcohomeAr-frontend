@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EcoHome AR Study</title>
+    <title>EcoHome AR</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
         .ui-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 100; }
         .btn { padding: 15px 20px; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
-        /* Clean Instruction Panel - No Icons */
+        /* THE UPDATED STEP-BY-STEP PANEL */
         #instructions {
-            position: fixed; top: 10px; width: 80%; left: 10%; background: rgba(0,0,0,0.85);
-            color: white; padding: 15px; border-radius: 12px; z-index: 110; text-align: center; border: 2px solid #2ecc71;
+            position: fixed; top: 10px; width: 85%; left: 7.5%; background: rgba(0,0,0,0.9);
+            color: white; padding: 20px; border-radius: 15px; z-index: 110; text-align: left; border: 2px solid #2ecc71;
         }
 
         #tipButton {
-            display: none; position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+            display: none; position: fixed; top: 180px; left: 50%; transform: translateX(-50%);
             background: #2ecc71; color: white; padding: 12px 25px; border-radius: 30px;
             font-weight: bold; z-index: 100; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
@@ -24,26 +24,27 @@
         #recBox {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 80%; background: white; color: black; padding: 25px; border-radius: 20px;
-            z-index: 120; box-shadow: 0 0 30px rgba(0,0,0,0.8); text-align: center;
+            z-index: 120; box-shadow: 0 0 40px rgba(0,0,0,0.8); text-align: center;
         }
     </style>
 </head>
 <body>
 
     <div id="instructions">
-        <strong>Study Instructions:</strong><br>
-        1. Set Laptop Brightness to 100 percent<br>
-        2. Point camera at the Hiro Marker<br>
-        3. Tap an appliance button below.
-        <button onclick="this.parentElement.style.display='none'" style="margin-top:10px; width:100%; background:#2ecc71; border:none; color:white; padding:8px; border-radius:5px; font-weight:bold;">I'm Ready</button>
+        <h2 style="margin: 0 0 10px 0; color: #2ecc71; text-align: center;">EcoHome</h2>
+        <strong>Step 1:</strong> Set Laptop Brightness to 100%<br>
+        <strong>Step 2:</strong> Hold phone <strong>0.5 metres (50cm) away</strong> from the Hiro image<br>
+        <strong>Step 3:</strong> Keep phone <strong>parallel</strong> to the screen for a stable scan<br>
+        <strong>Step 4:</strong> Tap an appliance button below to see the energy data.
+        <button onclick="this.parentElement.style.display='none'" style="margin-top:15px; width:100%; background:#2ecc71; border:none; color:white; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Start EcoHome</button>
     </div>
 
     <button id="tipButton" onclick="showTip()">View Sustainability Method</button>
 
     <div id="recBox">
         <h3 style="color:#2ecc71; margin-top:0;">Sustainability Method</h3>
-        <p id="recText"></p>
-        <button onclick="document.getElementById('recBox').style.display='none'" style="background:#333; color:white; border:none; padding:10px 20px; border-radius:8px;">Close</button>
+        <p id="recText" style="line-height: 1.5; font-size: 16px;"></p>
+        <button onclick="document.getElementById('recBox').style.display='none'" style="background:#333; color:white; border:none; padding:12px 25px; border-radius:10px; font-weight:bold;">Close</button>
     </div>
 
     <div class="ui-container">
@@ -52,22 +53,21 @@
         <button onclick="scan('LED_01')" class="btn" style="background: #2ecc71;">Scan LED</button>
     </div>
 
-   <a-scene 
+    <a-scene 
         embedded 
         arjs="sourceType: webcam; debugUIEnabled: false;" 
         vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true;">
+        renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;">
         
         <a-marker preset="hiro">
-            
             <a-sphere 
                 id="cloud" 
-                position="0 0.6 0" 
-                radius="0.6" 
+                position="0 0.4 0" 
+                radius="0.35" 
                 material="color: grey; opacity: 0.9; shader: flat;">
             </a-sphere>
             
-            <a-entity position="0 1.8 0" scale="2 2 2">
+            <a-entity position="0 2.2 0" scale="2.2 2.2 2.2">
                 <a-plane 
                     width="2.5" 
                     height="1.2" 
@@ -76,15 +76,14 @@
                 
                 <a-text 
                     id="infoText" 
-                    value="Select Appliance\nTo Load Data" 
+                    value="Align with Marker\nThen Select Item" 
                     align="center" 
                     color="white" 
-                    width="4.5" 
-                    position="0 0 0.2"
-                    wrap-count="25">
+                    width="4.8" 
+                    position="0 0 0.4"
+                    wrap-count="22">
                 </a-text>
             </a-entity>
-
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
@@ -95,7 +94,7 @@
         async function scan(id) {
             const infoText = document.querySelector('#infoText');
             const sphere = document.querySelector('#cloud');
-            infoText.setAttribute('value', 'Fetching...');
+            infoText.setAttribute('value', 'Loading...');
             
             try {
                 const res = await fetch(window.location.origin + "/calculate", {
@@ -105,15 +104,19 @@
                 });
                 const data = await res.json();
                 
+                // Update Sphere Color
                 sphere.setAttribute('material', 'color', data.color);
+                
+                // Update Details (Name, Watts, Cost)
                 const details = `${data.name}\n${data.watts}W | AED ${data.cost}/hr\n${data.nudge}`;
                 infoText.setAttribute('value', details);
                 
+                // Show Sustainability Method Button
                 currentTip = data.tip;
                 document.getElementById('tipButton').style.display = 'block';
                 
             } catch (e) { 
-                infoText.setAttribute('value', 'Error: Link Broken');
+                infoText.setAttribute('value', 'Connection Error');
             }
         }
 
