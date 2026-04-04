@@ -5,54 +5,115 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #000; }
+        /* CSS FIX: Force the viewport to stay locked and prevent horizontal shifting */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            width: 100vw; 
+            height: 100vh;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #000; 
+        }
         
-        /* 1. DATA CARD: Professional Layered Design */
+        /* DATA CARD: Centered using the 50%/translateX formula */
         #dataCard {
-            display: none; position: fixed; top: 20px; left: 5%; width: 90%;
-            background: rgba(255, 255, 255, 0.95); color: #1a1a1a; padding: 20px;
-            border-radius: 20px; border-left: 8px solid #2ecc71; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.5s ease;
+            display: none; 
+            position: fixed; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.96); 
+            color: #1a1a1a; 
+            padding: 20px;
+            border-radius: 20px; 
+            border-left: 8px solid #2ecc71; 
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
+            transition: all 0.5s ease;
             backdrop-filter: blur(10px);
+            box-sizing: border-box; /* Keeps padding inside the card width */
         }
 
-        /* 2. SOLAR BADGE: High-end visual nudge */
         .solar-badge {
-            float: right; background: #fff9c4; color: #fbc02d; padding: 4px 12px;
-            border-radius: 15px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+            float: right; 
+            background: #fff9c4; 
+            color: #fbc02d; 
+            padding: 4px 12px;
+            border-radius: 15px; 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-transform: uppercase;
             border: 1px solid #fbc02d;
         }
 
-        /* 3. SUSTAINABILITY STEPS: Organized & Professional */
         .step-container { margin-top: 15px; display: none; }
         .step-item {
-            background: #f1f8e9; border-radius: 10px; padding: 10px;
-            margin-bottom: 8px; border-left: 3px solid #8bc34a; font-size: 13px;
+            background: #f1f8e9; 
+            border-radius: 10px; 
+            padding: 10px;
+            margin-bottom: 8px; 
+            border-left: 3px solid #8bc34a; 
+            font-size: 13px;
         }
 
-        .btn-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 12px; z-index: 110; }
+        .btn-container { 
+            position: fixed; 
+            bottom: 30px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            z-index: 110; 
+        }
         .btn { 
-            padding: 16px; color: white; border: none; border-radius: 15px; 
-            font-weight: bold; flex: 1; margin: 0 5px; cursor: pointer;
-            transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 16px; 
+            color: white; 
+            border: none; 
+            border-radius: 15px; 
+            font-weight: bold; 
+            flex: 1; 
+            margin: 0 5px; 
+            cursor: pointer;
+            transition: transform 0.2s; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .btn:active { transform: scale(0.95); }
 
+        /* FULL SCREEN WELCOME OVERLAY */
         #instructions {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.8); color: white; z-index: 200;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.85); 
+            color: white; 
+            z-index: 200;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
     <div id="instructions">
-        <div style="background: white; color: black; padding: 30px; border-radius: 25px; width: 80%;">
-            <h2 style="margin-top:0;">Welcome</h2>
-            <p>1. Point camera at Hiro Marker<br>2. Select an appliance below</p>
+        <div style="background: white; color: black; padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; box-sizing: border-box;">
+            <h2 style="margin-top:0; color: #2ecc71;">Welcome to EcoHome AR</h2>
+            <p style="text-align: left; line-height: 1.6; font-size: 14px;">
+                <strong>1. Lighting:</strong> Ensure you are in a well-lit room for marker detection 💡<br>
+                <strong>2. Positioning:</strong> Point your camera at the <b>Hiro Marker</b> on your laptop 🎯<br>
+                <strong>3. Distance:</strong> Keep your phone <b>30cm - 50cm</b> away from the screen 📏<br>
+                <strong>4. Interact:</strong> Tap an appliance button below to see the data nudge.
+            </p>
             <button onclick="this.parentElement.parentElement.style.display='none'" 
-                    style="background:#2ecc71; color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold;">
+                    style="background:#2ecc71; color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor: pointer; font-size: 16px;">
                 START SCANNING
             </button>
         </div>
@@ -63,14 +124,14 @@
         <h2 id="appName" style="margin:0; font-size: 18px;">Appliance Name</h2>
         
         <div style="margin: 15px 0;">
-            <span id="appStats" style="font-size: 24px; font-weight: 800;">0W</span>
-            <span id="appNudge" style="margin-left: 10px; font-size: 14px; color: #666;">Status</span>
+            <span id="appStats" style="font-size: 24px; font-weight: 800;">AED 0.00/hr</span>
+            <span id="appNudge" style="margin-left: 10px; font-size: 14px; color: #666;">(0W)</span>
         </div>
 
         <div id="stepContainer" class="step-container">
             <div style="font-weight: bold; font-size: 12px; color: #2ecc71; margin-bottom: 8px;">RENEWABLE ACTION PLAN:</div>
-            <div class="step-item" id="step1">Step 1 loading...</div>
-            <div class="step-item" id="step2" style="border-left-color: #3498db; background: #e3f2fd;">Step 2 loading...</div>
+            <div class="step-item" id="step1"></div>
+            <div class="step-item" id="step2" style="border-left-color: #3498db; background: #e3f2fd;"></div>
         </div>
     </div>
 
@@ -90,6 +151,7 @@
     <script>
         async function scan(id) {
             try {
+                // Ensure origin is correct for Render deployment
                 const res = await fetch(window.location.origin + "/calculate", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -97,10 +159,10 @@
                 });
                 const data = await res.json();
                 
-                // Update AR Anchor
+                // 1. Update the AR Anchor Sphere Color
                 document.querySelector('#cloud').setAttribute('material', 'color', data.color);
                 
-                // Update UI Card
+                // 2. Display and Style the Data Card
                 const card = document.getElementById('dataCard');
                 card.style.display = 'block';
                 card.style.borderLeftColor = data.color;
@@ -109,7 +171,7 @@
                 document.getElementById('appStats').innerText = `AED ${data.cost}/hr`;
                 document.getElementById('appNudge').innerText = `(${data.watts}W)`;
                 
-                // RENEWABLE LOGIC NUDGE
+                // 3. Update the Renewable Action Plan
                 document.getElementById('stepContainer').style.display = 'block';
                 
                 if(data.watts > 2000) {
@@ -126,7 +188,10 @@
                     document.getElementById('step2').innerText = "Minimal carbon footprint detected.";
                 }
                 
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Fetch error:", e);
+                alert("Connection failed. Ensure the server is live.");
+            }
         }
     </script>
 </body>
