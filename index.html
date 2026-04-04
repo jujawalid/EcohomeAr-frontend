@@ -5,17 +5,9 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        /* CSS FIX: Force the viewport to stay locked and prevent horizontal shifting */
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            width: 100vw; 
-            height: 100vh;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background-color: #000; 
-        }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: #000; }
         
-        /* DATA CARD: Centered using the 50%/translateX formula */
+        /* Centered Data Card */
         #dataCard {
             display: none; 
             position: fixed; 
@@ -24,121 +16,61 @@
             transform: translateX(-50%); 
             width: 90%;
             max-width: 400px;
-            background: rgba(255, 255, 255, 0.96); 
-            color: #1a1a1a; 
+            background: rgba(0, 0, 0, 0.85); 
+            color: white; 
             padding: 20px;
-            border-radius: 20px; 
-            border-left: 8px solid #2ecc71; 
+            border-radius: 15px; 
+            border-left: 5px solid #2ecc71; 
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
-            transition: all 0.5s ease;
-            backdrop-filter: blur(10px);
-            box-sizing: border-box; /* Keeps padding inside the card width */
-        }
-
-        .solar-badge {
-            float: right; 
-            background: #fff9c4; 
-            color: #fbc02d; 
-            padding: 4px 12px;
-            border-radius: 15px; 
-            font-size: 11px; 
-            font-weight: 800; 
-            text-transform: uppercase;
-            border: 1px solid #fbc02d;
-        }
-
-        .step-container { margin-top: 15px; display: none; }
-        .step-item {
-            background: #f1f8e9; 
-            border-radius: 10px; 
-            padding: 10px;
-            margin-bottom: 8px; 
-            border-left: 3px solid #8bc34a; 
-            font-size: 13px;
-        }
-
-        .btn-container { 
-            position: fixed; 
-            bottom: 30px; 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            gap: 12px; 
-            z-index: 110; 
-        }
-        .btn { 
-            padding: 16px; 
-            color: white; 
-            border: none; 
-            border-radius: 15px; 
-            font-weight: bold; 
-            flex: 1; 
-            margin: 0 5px; 
-            cursor: pointer;
-            transition: transform 0.2s; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .btn:active { transform: scale(0.95); }
-
-        /* FULL SCREEN WELCOME OVERLAY */
-        #instructions {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.85); 
-            color: white; 
-            z-index: 200;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center;
-            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             box-sizing: border-box;
+        }
+
+        .btn-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 110; }
+        .btn { padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; flex: 1; margin: 0 5px; cursor: pointer; }
+
+        /* Simple Welcome Overlay */
+        #instructions {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); color: white; z-index: 200;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        
+        #instructionBox {
+            background: white; color: black; padding: 30px; border-radius: 20px; width: 85%; max-width: 400px;
         }
     </style>
 </head>
 <body>
 
     <div id="instructions">
-        <div style="background: white; color: black; padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; box-sizing: border-box;">
+        <div id="instructionBox">
             <h2 style="margin-top:0; color: #2ecc71;">Welcome to EcoHome AR</h2>
-            <p style="text-align: left; line-height: 1.6; font-size: 14px;">
-                <strong>1. Lighting:</strong> Ensure you are in a well-lit room for marker detection 💡<br>
-                <strong>2. Positioning:</strong> Point your camera at the <b>Hiro Marker</b> on your laptop 🎯<br>
-                <strong>3. Distance:</strong> Keep your phone <b>30cm - 50cm</b> away from the screen 📏<br>
-                <strong>4. Interact:</strong> Tap an appliance button below to see the data nudge.
+            <p style="text-align: left; line-height: 1.6;">
+                1. Ensure your room is well lit.<br>
+                2. Point your camera at the Hiro Marker.<br>
+                3. Keep a distance of 30cm to 50cm.<br>
+                4. Tap a button below to scan.
             </p>
             <button onclick="this.parentElement.parentElement.style.display='none'" 
-                    style="background:#2ecc71; color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor: pointer; font-size: 16px;">
-                START SCANNING
+                    style="margin-top:10px; width:100%; background:#2ecc71; border:none; color:white; padding:15px; border-radius:10px; font-weight:bold; cursor: pointer; font-size: 16px;">
+                START
             </button>
         </div>
     </div>
 
     <div id="dataCard">
-        <div class="solar-badge" id="solarLabel">Solar Ready</div>
-        <h2 id="appName" style="margin:0; font-size: 18px;">Appliance Name</h2>
-        
-        <div style="margin: 15px 0;">
-            <span id="appStats" style="font-size: 24px; font-weight: 800;">AED 0.00/hr</span>
-            <span id="appNudge" style="margin-left: 10px; font-size: 14px; color: #666;">(0W)</span>
-        </div>
-
-        <div id="stepContainer" class="step-container">
-            <div style="font-weight: bold; font-size: 12px; color: #2ecc71; margin-bottom: 8px;">RENEWABLE ACTION PLAN:</div>
-            <div class="step-item" id="step1"></div>
-            <div class="step-item" id="step2" style="border-left-color: #3498db; background: #e3f2fd;"></div>
-        </div>
+        <h2 id="appName" style="margin:0; color:#2ecc71;">Appliance Name</h2>
+        <p id="appStats" style="font-size: 18px; margin: 10px 0;"></p>
+        <p id="appNudge" style="font-weight: bold; margin: 0;"></p>
+        <hr style="border: 0.5px solid #444; margin: 15px 0;">
+        <p id="appTip" style="font-style: italic; color: #aaa; font-size: 14px;"></p>
     </div>
 
     <div class="btn-container">
-        <button onclick="scan('AC_01')" class="btn" style="background: #ef5350;">AC</button>
-        <button onclick="scan('FRIDGE_01')" class="btn" style="background: #ffa726;">FRIDGE</button>
-        <button onclick="scan('LED_01')" class="btn" style="background: #66bb6a;">LED</button>
+        <button onclick="scan('AC_01')" class="btn" style="background: #ff4d4d;">AC</button>
+        <button onclick="scan('FRIDGE_01')" class="btn" style="background: #ffa500;">Fridge</button>
+        <button onclick="scan('LED_01')" class="btn" style="background: #2ecc71;">LED</button>
     </div>
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
@@ -151,7 +83,6 @@
     <script>
         async function scan(id) {
             try {
-                // Ensure origin is correct for Render deployment
                 const res = await fetch(window.location.origin + "/calculate", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -159,39 +90,19 @@
                 });
                 const data = await res.json();
                 
-                // 1. Update the AR Anchor Sphere Color
+                // Update the small AR Sphere color
                 document.querySelector('#cloud').setAttribute('material', 'color', data.color);
                 
-                // 2. Display and Style the Data Card
-                const card = document.getElementById('dataCard');
-                card.style.display = 'block';
-                card.style.borderLeftColor = data.color;
-                
+                // Update the Clean Data Card
+                document.getElementById('dataCard').style.display = 'block';
+                document.getElementById('dataCard').style.borderLeftColor = data.color;
                 document.getElementById('appName').innerText = data.name;
-                document.getElementById('appStats').innerText = `AED ${data.cost}/hr`;
-                document.getElementById('appNudge').innerText = `(${data.watts}W)`;
+                document.getElementById('appName').style.color = data.color;
+                document.getElementById('appStats').innerText = `${data.watts}W | AED ${data.cost}/hr`;
+                document.getElementById('appNudge').innerText = data.nudge;
+                document.getElementById('appTip').innerText = data.tip;
                 
-                // 3. Update the Renewable Action Plan
-                document.getElementById('stepContainer').style.display = 'block';
-                
-                if(data.watts > 2000) {
-                    document.getElementById('solarLabel').innerText = "High Solar Load";
-                    document.getElementById('step1').innerText = "Set AC to 24°C to reduce load for future solar grid.";
-                    document.getElementById('step2').innerText = "Consider a Solar-Thermal Hybrid AC unit.";
-                } else if (data.watts > 100) {
-                    document.getElementById('solarLabel').innerText = "Medium Solar Load";
-                    document.getElementById('step1').innerText = "Move to daytime usage to match peak solar hours.";
-                    document.getElementById('step2').innerText = "Ensure ventilation to maintain efficiency.";
-                } else {
-                    document.getElementById('solarLabel').innerText = "100% Solar Ready";
-                    document.getElementById('step1').innerText = "Perfect for off-grid renewable energy use.";
-                    document.getElementById('step2').innerText = "Minimal carbon footprint detected.";
-                }
-                
-            } catch (e) { 
-                console.error("Fetch error:", e);
-                alert("Connection failed. Ensure the server is live.");
-            }
+            } catch (e) { console.error(e); }
         }
     </script>
 </body>
