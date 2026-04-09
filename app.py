@@ -6,28 +6,20 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+# --- DATABASE CONNECTION ---
 uri = "mongodb+srv://jujawalid_db_user:Juja2004@ecohomear.dj1aeau.mongodb.net/?retryWrites=true&w=majority"
 
-# --- CONNECT TO DATABASE ---
 try:
     client = MongoClient(uri, serverSelectionTimeoutMS=5000)
     db = client.EcohomeAr 
     collection = db.appliances
-    
-    # The 'ping' check
     client.admin.command('ping')
-    print("\n" + "="*30)
-    print("✅ MONGODB CONNECTED SUCCESSFULLY")
-    print(f"📡 Using Collection: {collection.name}")
-    print("="*30 + "\n")
+    print("\n✅ MONGODB CONNECTED SUCCESSFULLY")
 except Exception as e:
-    print("\n" + "!"*30)
-    print(f"❌ DATABASE ERROR: {e}")
-    print("!"*30 + "\n")
+    print(f"\n❌ DATABASE ERROR: {e}")
 
 @app.route('/')
 def home():
-    # This works regardless of which folder you run the command from
     base_dir = os.path.dirname(os.path.abspath(__file__))
     return send_from_directory(base_dir, 'index.html')
 
@@ -35,22 +27,31 @@ def home():
 def calculate():
     data = request.json
     appliance_id = data.get('id')
+    # EDIT: Capture the Guest Name from the frontend
+    user_name = data.get('userName', 'Guest') 
+    
     appliance = collection.find_one({"id": appliance_id})
     
     if appliance:
         watts = appliance['watts']
+        # Professional DEWA-style slab logic
         rate = 0.38 if watts > 2000 else 0.23
         cost_per_hour = (watts / 1000) * rate
 
+        # --- EDIT: PERSONALIZED RECOMMENDATION ENGINE ---
         if watts > 2000:
             color, nudge = "red", " HIGH CONSUMPTION"
-            tip = "Recommendation: Set AC to 24°C to optimize cooling efficiency."
+            # Personalized tip using the Guest Name
+            tip = f"Hey {user_name}, setting AC to 24°C can save you AED 50/month."
+            percentage_height = 90  # For your frontend chart
         elif watts > 100:
             color, nudge = "yellow", " MODERATE USAGE"
-            tip = "Sustainability: Keep appliances 10cm from walls for better airflow."
+            tip = "Recommendation: Keep Fridge 10cm from walls for 15% better airflow."
+            percentage_height = 40
         else:
             color, nudge = "green", "HIGHLY EFFICIENT"
-            tip = "Eco-Tip: LED lighting reduces energy waste by 80%."
+            tip = f"Eco-Tip: {user_name}, your LED is 100% compatible with Solar Energy."
+            percentage_height = 10
 
         return jsonify({
             "name": appliance['name'],
@@ -58,8 +59,11 @@ def calculate():
             "cost": f"{cost_per_hour:.3f}",
             "color": color,
             "nudge": nudge,
-            "tip": tip
+            "tip": tip,
+            "chartHeight": percentage_height, # Used for the CSS Bar Chart
+            "userName": user_name
         })
+    
     return jsonify({"error": "Not found"}), 404
 
 if __name__ == '__main__':
