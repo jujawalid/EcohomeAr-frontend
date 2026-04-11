@@ -7,11 +7,20 @@
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #000; }
         
-        /* Modal for Guest Registration */
         #nameEntry {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.95); z-index: 300; display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.96); z-index: 300; display: flex; justify-content: center; align-items: center;
         }
+
+        .modal-box {
+            background: white; padding: 30px; border-radius: 25px; width: 85%; max-width: 380px; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .guide-container {
+            text-align: left; background: #f8f9fa; padding: 18px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #eee;
+        }
+        .guide-container p { font-size: 13px; color: #444; margin: 10px 0; }
 
         #dataCard {
             display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
@@ -20,10 +29,7 @@
             z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.4); box-sizing: border-box; backdrop-filter: blur(10px);
         }
 
-        /* Comparison Chart Styling */
-        #chartContainer {
-            margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: none;
-        }
+        #chartContainer { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: none; }
         .bar-row { display: flex; align-items: center; margin-bottom: 5px; }
         .bar-label { width: 60px; font-size: 10px; font-weight: bold; }
         .bar-bg { flex-grow: 1; background: #eee; height: 12px; border-radius: 6px; overflow: hidden; }
@@ -37,11 +43,21 @@
 <body>
 
     <div id="nameEntry">
-        <div style="background: white; padding: 30px; border-radius: 25px; width: 80%; max-width: 350px; text-align: center;">
-            <h2 style="color: #2ecc71;">Setup Profile</h2>
+        <div id="step1Box" class="modal-box">
+            <h2 style="color: #2ecc71; margin-top: 0;">Setup Profile</h2>
             <p style="font-size: 14px; color: #666;">Enter your name to personalize your energy report.</p>
-            <input type="text" id="userInput" placeholder="Your Name" style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px;">
-            <button onclick="startApp()" style="margin-top:20px; width:100%; background:#2ecc71; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">CONTINUE</button>
+            <input type="text" id="userInput" placeholder="Your Name" style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px;">
+            <button onclick="showInstructions()" style="margin-top:20px; width:100%; background:#2ecc71; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">NEXT</button>
+        </div>
+
+        <div id="step2Box" class="modal-box" style="display: none;">
+            <h2 id="welcomeGreeting" style="color: #2ecc71; margin-top: 0;">Hi Guest!</h2>
+            <div class="guide-container">
+                <p>📸 <b>Aim:</b> Point camera at the Hiro Marker.</p>
+                <p>🔘 <b>Scan:</b> Tap the buttons below (AC, Fridge, LED).</p>
+                <p>📊 <b>Learn:</b> Watch your live energy chart update.</p>
+            </div>
+            <button onclick="enterAR()" style="width:100%; background:#2ecc71; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">START EXPERIENCE</button>
         </div>
     </div>
 
@@ -91,9 +107,17 @@
     <script>
         let userName = "Guest";
 
-        function startApp() {
+        function showInstructions() {
             const input = document.getElementById('userInput').value;
-            if(input) userName = input;
+            if(input.trim() !== "") userName = input;
+            
+            // Toggle visibility
+            document.getElementById('step1Box').style.display = 'none';
+            document.getElementById('step2Box').style.display = 'block';
+            document.getElementById('welcomeGreeting').innerText = "Hi " + userName + "!";
+        }
+
+        function enterAR() {
             document.getElementById('nameEntry').style.display = 'none';
         }
 
@@ -102,14 +126,12 @@
                 const res = await fetch(window.location.origin + "/calculate", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id: id, userName: userName }) // Sending name to Flask
+                    body: JSON.stringify({ id: id, userName: userName })
                 });
                 const data = await res.json();
                 
-                // Update AR Sphere
                 document.querySelector('#cloud').setAttribute('material', 'color', data.color);
                 
-                // Update UI Card
                 const card = document.getElementById('dataCard');
                 card.style.display = 'block';
                 card.style.borderLeftColor = data.color;
@@ -120,7 +142,6 @@
                 document.getElementById('appNudge').innerText = `(${data.watts}W)`;
                 document.getElementById('personalizedTip').innerText = data.tip;
 
-                // Update Action Plan
                 if(data.watts > 2000) {
                     document.getElementById('step1').innerText = "Set thermostat to 24°C.";
                     document.getElementById('step2').innerText = "Clean filters monthly.";
@@ -135,7 +156,6 @@
                     document.getElementById('bar-led').style.width = data.chartHeight + "%";
                 }
 
-                // Show the Chart
                 document.getElementById('chartContainer').style.display = 'block';
                 
             } catch (e) { console.error(e); }
