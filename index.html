@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EcoHome AR App</title>
+    <title>EcoHome AR Study</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #000; }
         
+        /* TWO-STEP ONBOARDING OVERLAY */
         #nameEntry {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.96); z-index: 300; display: flex; justify-content: center; align-items: center;
@@ -18,10 +19,11 @@
         }
 
         .guide-container {
-            text-align: left; background: #f8f9fa; padding: 18px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #eee;
+            text-align: left; background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #eee;
         }
-        .guide-container p { font-size: 13px; color: #444; margin: 10px 0; }
+        .guide-container p { font-size: 14px; color: #333; margin: 12px 0; line-height: 1.4; }
 
+        /* DATA CARD UI */
         #dataCard {
             display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
             width: 92%; max-width: 400px; background: rgba(255, 255, 255, 0.98); 
@@ -29,15 +31,16 @@
             z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.4); box-sizing: border-box; backdrop-filter: blur(10px);
         }
 
+        /* COMPARISON CHART */
         #chartContainer { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: none; }
-        .bar-row { display: flex; align-items: center; margin-bottom: 5px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 6px; }
         .bar-label { width: 60px; font-size: 10px; font-weight: bold; }
         .bar-bg { flex-grow: 1; background: #eee; height: 12px; border-radius: 6px; overflow: hidden; }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
         .step-item { background: #f9f9f9; border-radius: 10px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #2ecc71; font-size: 13px; }
         .btn-container { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 110; }
-        .btn { padding: 15px; color: white; border: none; border-radius: 12px; font-weight: bold; flex: 1; margin: 0 5px; cursor: pointer; }
+        .btn { padding: 16px; color: white; border: none; border-radius: 14px; font-weight: bold; flex: 1; margin: 0 5px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -45,19 +48,20 @@
     <div id="nameEntry">
         <div id="step1Box" class="modal-box">
             <h2 style="color: #2ecc71; margin-top: 0;">Setup Profile</h2>
-            <p style="font-size: 14px; color: #666;">Enter your name to personalize your energy report.</p>
-            <input type="text" id="userInput" placeholder="Your Name" style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px;">
-            <button onclick="showInstructions()" style="margin-top:20px; width:100%; background:#2ecc71; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">NEXT</button>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Enter your name to personalize your energy report.</p>
+            <input type="text" id="userInput" placeholder="Your Name" style="width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; outline-color: #2ecc71;">
+            <button onclick="showInstructions()" style="margin-top:20px; width:100%; background:#2ecc71; color:white; padding:18px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size: 16px;">NEXT</button>
         </div>
 
         <div id="step2Box" class="modal-box" style="display: none;">
-            <h2 id="welcomeGreeting" style="color: #2ecc71; margin-top: 0;">Hi Guest!</h2>
+            <h2 id="welcomeGreeting" style="color: #2ecc71; margin-top: 0; font-size: 24px;">Hi Guest!</h2>
             <div class="guide-container">
-                <p>📸 <b>Aim:</b> Point camera at the Hiro Marker.</p>
-                <p>🔘 <b>Scan:</b> Tap the buttons below (AC, Fridge, LED).</p>
-                <p>📊 <b>Learn:</b> Watch your live energy chart update.</p>
+                <div style="font-weight: bold; font-size: 12px; color: #2ecc71; margin-bottom: 12px; letter-spacing: 1px;">QUICK START GUIDE:</div>
+                <p><strong>💡 Light:</strong> Ensure your room is well lit for best tracking.</p>
+                <p><strong>📏 Distance:</strong> Keep camera 30cm - 50cm from marker.</p>
+                <p><strong>🔘 Scan:</strong> Tap the appliance buttons below (AC, Fridge, LED).</p>
             </div>
-            <button onclick="enterAR()" style="width:100%; background:#2ecc71; color:white; padding:15px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">START EXPERIENCE</button>
+            <button onclick="enterAR()" style="width:100%; background:#2ecc71; color:white; padding:18px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size: 16px;">START EXPERIENCE</button>
         </div>
     </div>
 
@@ -69,13 +73,13 @@
         </div>
         
         <div class="step-container">
-            <div id="personalizedTip" style="font-weight: bold; font-size: 13px; color: #333; margin-bottom: 12px; background: #e8f5e9; padding: 10px; border-radius: 8px;"></div>
+            <div id="personalizedTip" style="font-weight: bold; font-size: 13px; color: #333; margin-bottom: 12px; background: #f1f8e9; padding: 12px; border-radius: 10px; border: 1px solid #dcedc8;"></div>
             <div class="step-item" id="step1">Step 1...</div>
             <div class="step-item" id="step2" style="border-left-color: #3498db; background: #e3f2fd;">Step 2...</div>
         </div>
 
         <div id="chartContainer">
-            <div style="font-size: 11px; font-weight: bold; margin-bottom: 5px;">HOUSEHOLD IMPACT:</div>
+            <div style="font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #888;">HOUSEHOLD IMPACT (AED/hr):</div>
             <div class="bar-row">
                 <div class="bar-label">AC</div>
                 <div class="bar-bg"><div id="bar-ac" class="bar-fill" style="background: #ef5350;"></div></div>
@@ -111,7 +115,6 @@
             const input = document.getElementById('userInput').value;
             if(input.trim() !== "") userName = input;
             
-            // Toggle visibility
             document.getElementById('step1Box').style.display = 'none';
             document.getElementById('step2Box').style.display = 'block';
             document.getElementById('welcomeGreeting').innerText = "Hi " + userName + "!";
@@ -158,7 +161,7 @@
 
                 document.getElementById('chartContainer').style.display = 'block';
                 
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Update failed:", e); }
         }
     </script>
 </body>
