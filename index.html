@@ -7,7 +7,7 @@
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #000; }
         
-        /* TWO-STEP ONBOARDING OVERLAY */
+        
         #nameEntry {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.96); z-index: 300; display: flex; justify-content: center; align-items: center;
@@ -23,7 +23,7 @@
         }
         .guide-container p { font-size: 14px; color: #333; margin: 12px 0; line-height: 1.5; }
 
-        /* DATA CARD UI */
+       
         #dataCard {
             display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
             width: 92%; max-width: 400px; background: rgba(255, 255, 255, 0.98); 
@@ -77,6 +77,7 @@
             <div id="personalizedTip" style="font-weight: bold; font-size: 13px; color: #333; margin-bottom: 12px; background: #f1f8e9; padding: 12px; border-radius: 10px; border: 1px solid #dcedc8;"></div>
             <div class="step-item" id="step1">Step 1...</div>
             <div class="step-item" id="step2" style="border-left-color: #3498db; background: #e3f2fd;">Step 2...</div>
+            <div class="step-item" id="step3" style="border-left-color: #9b59b6; background: #f3e5f5;">Step 3...</div>
         </div>
 
         <div id="chartContainer">
@@ -145,22 +146,24 @@
                 document.getElementById('appStats').innerText = `AED ${data.cost}/hr`;
                 document.getElementById('appNudge').innerText = `(${data.watts}W)`;
                 document.getElementById('personalizedTip').innerText = data.tip;
+if(data.watts > 2000) {
+    document.getElementById('step1').innerText = "Set thermostat to 24°C.";
+    document.getElementById('step2').innerText = "Clean filters monthly.";
+    document.getElementById('step3').innerText = "Consider solar panels to offset AC costs.";
+    document.getElementById('bar-ac').style.width = data.chartHeight + "%";
+} else if (data.watts > 100) {
+    document.getElementById('step1').innerText = "Check door seals.";
+    document.getElementById('step2').innerText = "Keep 10cm wall gap.";
+    document.getElementById('step3').innerText = "Upgrade to a 5-star energy rated fridge.";
+    document.getElementById('bar-fridge').style.width = data.chartHeight + "%";
+} else {
+    document.getElementById('step1').innerText = "Turn off when leaving.";
+    document.getElementById('step2').innerText = "Use solar power banks.";
+    document.getElementById('step3').innerText = "Replace remaining bulbs with smart LEDs.";
+    document.getElementById('bar-led').style.width = data.chartHeight + "%";
+}
 
-                if(data.watts > 2000) {
-                    document.getElementById('step1').innerText = "Set thermostat to 24°C.";
-                    document.getElementById('step2').innerText = "Clean filters monthly.";
-                    document.getElementById('bar-ac').style.width = data.chartHeight + "%";
-                } else if (data.watts > 100) {
-                    document.getElementById('step1').innerText = "Check door seals.";
-                    document.getElementById('step2').innerText = "Keep 10cm wall gap.";
-                    document.getElementById('bar-fridge').style.width = data.chartHeight + "%";
-                } else {
-                    document.getElementById('step1').innerText = "Turn off when leaving.";
-                    document.getElementById('step2').innerText = "Use solar power banks.";
-                    document.getElementById('bar-led').style.width = data.chartHeight + "%";
-                }
-
-                document.getElementById('chartContainer').style.display = 'block';
+            document.getElementById('chartContainer').style.display = 'block';
                 
             } catch (e) { console.error("Update failed:", e); }
         }
